@@ -1,12 +1,12 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import "react-quill/dist/quill.snow.css"
 import ReactQuill from "react-quill"
 import { Container, Form, Button } from "react-bootstrap"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import striptags from "striptags"
 import "./styles.css"
 
-const NewBlogPost = () => {
+const EditBlogPost = () => {
 
   const [title, setTitle] = useState('')
   const [cover, setCover] = useState('https://picsum.photos/200/300')
@@ -15,6 +15,7 @@ const NewBlogPost = () => {
   const [content, setContent] = useState('')
 
   const navigate = useNavigate()
+  const { blogId } = useParams()
 
   const handleSubmit = async e => {
     e.preventDefault()
@@ -24,12 +25,12 @@ const NewBlogPost = () => {
       cover,
       author: {
           name: authorName,
-          },
+        },
       content: striptags(content)
     }
     try {
-      const response = await fetch('http://127.0.0.1:3001/blogs', {
-        method: 'POST',
+      const response = await fetch(`http://127.0.0.1:3001/blogs/${blogId}`, {
+        method: 'PUT',
         body: JSON.stringify(newPost),
         headers: {
           'Content-Type': 'application/json'
@@ -45,6 +46,30 @@ const NewBlogPost = () => {
       console.error(error)
     }
   }
+
+  const fetchBlogDetails = async () => {
+    try {
+        const response = await fetch(`http://127.0.0.1:3001/blogs/${blogId}`)
+        if (response.ok) {
+          const data = await response.json()
+          setTitle(data.title)
+          setCover(data.cover)
+          setAuthorName(data.author.name)
+          setCategory(data.category)
+          setContent(data.content)
+        } else if (response.status === 404) {
+          navigate('/404')
+        } else {  
+          console.log('Fetch Failed')
+        }
+      } catch (error) {
+        console.error(error)
+      }
+  }
+
+  useEffect(() => {
+    fetchBlogDetails()
+  }, [])
 
     return (
       <Container className="new-blog-container">
@@ -115,4 +140,4 @@ const NewBlogPost = () => {
     )
 }
 
-export default NewBlogPost
+export default EditBlogPost
