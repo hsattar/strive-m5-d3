@@ -56,7 +56,11 @@ const NewBlogPost = () => {
         body: formData
       })
       if (response.ok) {
-        navigate('/')
+        if (authorAvatar) {
+          checkIfAvatarExists(data)
+        } else {
+          navigate('/')
+        }
       } else {
         console.log('PATCH Failed')
       }
@@ -65,6 +69,72 @@ const NewBlogPost = () => {
     }
   }
 
+  const checkIfAvatarExists = async data => {
+    try {
+      const response = await fetch(`http://127.0.0.1:3001/authors`)
+      if (response.ok) {
+        const authors = await response.json()
+        const author = authors.find(author => data.author.name === `${author.name} ${author.surname}`)
+        if (author) {
+          handleAuthorAvatarUpload(author)
+        } else {
+          createNewAvatar(data)
+        }
+      } else {
+        console.error('Fetch Failed')
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const createNewAvatar = async data => {
+    console.log(data)
+    console.log(data.author)
+    console.log(data.author.name)
+    const names = data.author.name.split(' ')
+    const name = names[0]
+    const surname = names[1]
+    const newAuthor = {
+      name,
+      surname,
+    }
+    try {
+      const response = await fetch(`http://127.0.0.1:3001/authors/`, {
+        method: 'POST',
+        body: JSON.stringify(newAuthor),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      if (response.ok) {
+        const author = await response.json()
+        handleAuthorAvatarUpload(author)
+      } else {
+        console.error('Creating user Failed')
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const handleAuthorAvatarUpload = async author => {
+    const formData = new FormData()
+    formData.append('avatar', authorAvatar)
+    try {
+      const response = await fetch(`http://127.0.0.1:3001/authors/${author.id}/uploadAvatar`, {
+        method: 'PATCH',
+        body: formData
+      })
+      if (response.ok) {
+        navigate('/')
+      } else {
+        console.error('POST AVATR Failed')
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
     return (
       <Container className="new-blog-container">
