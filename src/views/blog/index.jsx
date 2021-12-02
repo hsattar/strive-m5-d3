@@ -3,6 +3,7 @@ import { Container, Image } from "react-bootstrap"
 import BlogAuthor from "../../components/blog/blog-author"
 import BlogLike from "../../components/likes/BlogLike"
 // import posts from "../../data/posts.json"
+import BlogComments from '../../components/blog/blog-comment'
 import "./styles.css"
 import { useParams, useNavigate } from 'react-router-dom'
 
@@ -78,6 +79,10 @@ const Blog = () => {
           </div>
 
           <div dangerouslySetInnerHTML={{ __html: blog.content }}></div>
+
+        <h6 className='mt-4'>Comments:</h6>
+        { blog.comments.map((b, idx) => <BlogComments key={idx} data={b} /> ) }
+        
         </Container>
       }
       </div>
