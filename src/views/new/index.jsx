@@ -9,8 +9,9 @@ import "./styles.css"
 const NewBlogPost = () => {
 
   const [title, setTitle] = useState('')
-  const [cover, setCover] = useState('https://picsum.photos/200/300')
+  const [cover, setCover] = useState(null)
   const [authorName, setAuthorName] = useState('')
+  const [authorAvatar, setAuthorAvatar] = useState(null)
   const [category, setCategory] = useState('Action')
   const [content, setContent] = useState('')
 
@@ -37,14 +38,33 @@ const NewBlogPost = () => {
       })
       if (response.ok) {
         const data = await response.json()
-        navigate('/')
+        handleBlogCoverUploads(data)
       } else {
-        console.error('fetch failed')
+        console.error('POST failed')
       }
     } catch (error) {
       console.error(error)
     }
   }
+
+  const handleBlogCoverUploads = async data => {
+    const formData = new FormData()
+    formData.append('cover', cover)
+    try {
+      const response = await fetch(`http://127.0.0.1:3001/blogs/${data.id}/uploadCover`, {
+        method: 'PATCH',
+        body: formData
+      })
+      if (response.ok) {
+        navigate('/')
+      } else {
+        console.log('PATCH Failed')
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
 
     return (
       <Container className="new-blog-container">
@@ -60,9 +80,8 @@ const NewBlogPost = () => {
 
           <Form.Group controlId="blog-form" className="mt-3">
             <Form.Label>Cover Image</Form.Label>
-            <Form.Control size="lg" placeholder="Cover Image"  
-              value={cover}
-              onChange={e => setCover(e.target.value)}
+            <Form.Control type='file' size="lg"  
+              onChange={e => setCover(e.target.files[0])}
             />
           </Form.Group>
 
@@ -71,6 +90,13 @@ const NewBlogPost = () => {
             <Form.Control size="lg" placeholder="Author Name"  
               value={authorName}
               onChange={e => setAuthorName(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="blog-form" className="mt-3">
+            <Form.Label>Author Avatar (Optional)</Form.Label>
+            <Form.Control type='file' size="lg"  
+              onChange={e => setAuthorAvatar(e.target.files[0])}
             />
           </Form.Group>
 

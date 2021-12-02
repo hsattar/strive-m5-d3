@@ -5,14 +5,14 @@ import BlogItem from "../blog-item"
 
 const BlogList = () => {
 
-    const [posts, setPosts] = useState([])
+    const [blogs, setBlogs] = useState([])
 
     const fetchBlogs = async () => {
       try {
         const response = await fetch('http://127.0.0.1:3001/blogs')
         if (response.ok) {
           const data = await response.json()
-          setPosts(data)
+          setBlogs(data)
         } else {
           console.error('Fetch Failed')
         }
@@ -27,9 +27,9 @@ const BlogList = () => {
 
     return (
       <Row>
-        {posts.map((post) => (
+        {blogs.map((blog) => (
           <Col md={4} style={{ marginBottom: 50 }}>
-            <BlogItem key={post.title} {...post} />
+            <BlogItem key={blog.id} {...blog} />
           </Col>
         ))}
       </Row>
