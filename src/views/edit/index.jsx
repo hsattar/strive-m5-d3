@@ -13,6 +13,8 @@ const EditBlogPost = () => {
   const [authorName, setAuthorName] = useState('')
   const [category, setCategory] = useState('Action')
   const [content, setContent] = useState('')
+  const [authorAvatar, setAuthorAvatar] = useState(null)
+
 
   const navigate = useNavigate()
   const { blogId } = useParams()
@@ -85,9 +87,8 @@ const EditBlogPost = () => {
 
           <Form.Group controlId="blog-form" className="mt-3">
             <Form.Label>Cover Image</Form.Label>
-            <Form.Control size="lg" placeholder="Cover Image"  
-              value={cover}
-              onChange={e => setCover(e.target.value)}
+            <Form.Control type='file' size="lg"  
+              onChange={e => setCover(e.target.files[0])}
             />
           </Form.Group>
 
@@ -96,6 +97,13 @@ const EditBlogPost = () => {
             <Form.Control size="lg" placeholder="Author Name"  
               value={authorName}
               onChange={e => setAuthorName(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="blog-form" className="mt-3">
+            <Form.Label>Author Avatar (Optional)</Form.Label>
+            <Form.Control type='file' size="lg"  
+              onChange={e => setAuthorAvatar(e.target.files[0])}
             />
           </Form.Group>
 
