@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Container, Image } from "react-bootstrap"
+import { Container, Image, Modal, Button, Form } from "react-bootstrap"
 import BlogAuthor from "../../components/blog/blog-author"
 import BlogLike from "../../components/likes/BlogLike"
 // import posts from "../../data/posts.json"
@@ -10,10 +10,20 @@ import { useParams, useNavigate } from 'react-router-dom'
 const Blog = () => {
 
   const { blogId } = useParams()
+  const navigate = useNavigate()
 
   const [blog, setBlog] = useState({})
   const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
+
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const [comment, setComment] = useState({
+    author: '',
+    text: ''
+  })
+  const [commentChanges, setCommentChanges] = useState(0)
 
   const fetchBlog = async () => {
     try {
@@ -48,9 +58,30 @@ const Blog = () => {
     }
   }
 
+  const handleAddComment = async e => {
+    e.preventDefault()
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs/${blogId}/comments`, {
+        method: 'POST',
+        body: JSON.stringify(comment),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      if (response.ok) {
+        setCommentChanges(count => count + 1)
+        handleClose()
+      } else {
+        console.log('Posting Comment Failed')
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   useEffect(() => {
     fetchBlog()
-  }, [])
+  }, [commentChanges])
   return (
     <div className="blog-details-root">
       {
@@ -82,10 +113,37 @@ const Blog = () => {
 
         <div className="d-flex justify-content-between">
           <h6 className='mt-4'>Comments:</h6>
-          <p className='mb-1'>Add Comment</p>
+          <p className='mb-1' onClick={() => setShow(true)} >Add Comment</p>
         </div>
         { blog.comments.map((b, idx) => <BlogComments key={idx} data={b} /> ) }
         
+        <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Modal heading</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+        <Form>
+          <Form.Group>
+            <Form.Label>Name</Form.Label>
+            <Form.Control type="text" placeholder="Name" value={comment.author} onChange={e => setComment({...comment, author: e.target.value})}/>
+          </Form.Group>
+
+          <Form.Group>
+            <Form.Label className="mt-2">Comment</Form.Label>
+            <Form.Control type="text" placeholder="Comment" value={comment.text} onChange={e => setComment({...comment, text: e.target.value})}/>
+          </Form.Group>
+          <Button variant="success" type="submit" className="mt-3" onClick={handleAddComment}>
+            Add
+          </Button>
+        </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
         </Container>
       }
       </div>
