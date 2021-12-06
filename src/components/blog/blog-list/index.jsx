@@ -9,7 +9,7 @@ const BlogList = () => {
 
     const fetchBlogs = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:3001/blogs')
+        const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs`)
         if (response.ok) {
           const data = await response.json()
           setBlogs(data)

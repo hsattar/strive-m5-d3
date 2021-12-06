@@ -17,7 +17,7 @@ const Blog = () => {
 
   const fetchBlog = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:3001/blogs/${blogId}`)
+      const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs/${blogId}`)
       if (response.ok) {
         const data = await response.json()
         setBlog(data)
@@ -35,7 +35,7 @@ const Blog = () => {
 
   const handleDeleteBlog = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:3001/blogs/${blogId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs/${blogId}`, {
         method: 'DELETE'
       })
       if (response.ok) {
@@ -80,7 +80,10 @@ const Blog = () => {
 
           <div dangerouslySetInnerHTML={{ __html: blog.content }}></div>
 
-        <h6 className='mt-4'>Comments:</h6>
+        <div className="d-flex justify-content-between">
+          <h6 className='mt-4'>Comments:</h6>
+          <p className='mb-1'>Add Comment</p>
+        </div>
         { blog.comments.map((b, idx) => <BlogComments key={idx} data={b} /> ) }
         
         </Container>

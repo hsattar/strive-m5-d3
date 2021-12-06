@@ -29,7 +29,7 @@ const EditBlogPost = () => {
       content: striptags(content)
     }
     try {
-      const response = await fetch(`http://127.0.0.1:3001/blogs/${blogId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs/${blogId}`, {
         method: 'PUT',
         body: JSON.stringify(newPost),
         headers: {
@@ -49,7 +49,7 @@ const EditBlogPost = () => {
 
   const fetchBlogDetails = async () => {
     try {
-        const response = await fetch(`http://127.0.0.1:3001/blogs/${blogId}`)
+        const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs/${blogId}`)
         if (response.ok) {
           const data = await response.json()
           setTitle(data.title)

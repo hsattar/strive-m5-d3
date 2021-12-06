@@ -29,7 +29,7 @@ const NewBlogPost = () => {
       content: striptags(content)
     }
     try {
-      const response = await fetch('http://127.0.0.1:3001/blogs', {
+      const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs`, {
         method: 'POST',
         body: JSON.stringify(newPost),
         headers: {
@@ -51,7 +51,7 @@ const NewBlogPost = () => {
     const formData = new FormData()
     formData.append('cover', cover)
     try {
-      const response = await fetch(`http://127.0.0.1:3001/blogs/${data.id}/uploadCover`, {
+      const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs/${data.id}/uploadCover`, {
         method: 'PATCH',
         body: formData
       })
@@ -71,7 +71,7 @@ const NewBlogPost = () => {
 
   const checkIfAvatarExists = async data => {
     try {
-      const response = await fetch(`http://127.0.0.1:3001/authors`)
+      const response = await fetch(`${process.env.REACT_APP_BE_URL}/authors`)
       if (response.ok) {
         const authors = await response.json()
         const author = authors.find(author => data.author.name === `${author.name} ${author.surname}`)
@@ -100,7 +100,7 @@ const NewBlogPost = () => {
       surname,
     }
     try {
-      const response = await fetch(`http://127.0.0.1:3001/authors/`, {
+      const response = await fetch(`${process.env.REACT_APP_BE_URL}/authors`, {
         method: 'POST',
         body: JSON.stringify(newAuthor),
         headers: {
@@ -122,7 +122,7 @@ const NewBlogPost = () => {
     const formData = new FormData()
     formData.append('avatar', authorAvatar)
     try {
-      const response = await fetch(`http://127.0.0.1:3001/authors/${author.id}/uploadAvatar`, {
+      const response = await fetch(`${process.env.REACT_APP_BE_URL}/authors/${author.id}/uploadAvatar`, {
         method: 'PATCH',
         body: formData
       })
