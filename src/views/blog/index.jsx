@@ -82,6 +82,7 @@ const Blog = () => {
   useEffect(() => {
     fetchBlog()
   }, [commentChanges])
+
   return (
     <div className="blog-details-root">
       {
@@ -115,8 +116,11 @@ const Blog = () => {
           <h6 className='mt-4'>Comments:</h6>
           <p className='mb-1' onClick={() => setShow(true)} >Add Comment</p>
         </div>
+        
         { blog.comments.map((b, idx) => <BlogComments key={idx} data={b} /> ) }
         
+        <a href={`${process.env.REACT_APP_BE_URL}/blogs/${blogId}/downloadPDF`}><i className="pdf-icon bi bi-file-earmark-pdf"></i></a>
+
         <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Modal heading</Modal.Title>
