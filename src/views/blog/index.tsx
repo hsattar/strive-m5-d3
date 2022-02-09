@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { Container, Image, Modal, Button, Form } from "react-bootstrap"
 import BlogAuthor from "../../components/blog/blog-author"
 import BlogLike from "../../components/likes/BlogLike"
-// import posts from "../../data/posts.json"
 import BlogComments from '../../components/blog/blog-comment'
-import "./styles.css"
 import { useParams, useNavigate } from 'react-router-dom'
+import "./styles.css"
 
 const Blog = () => {
+
+  const { REACT_APP_BE_URL: BASE_URL } = process.env
 
   const { blogId } = useParams()
   const navigate = useNavigate()
@@ -27,7 +28,7 @@ const Blog = () => {
 
   const fetchBlog = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs/${blogId}`)
+      const response = await fetch(`${BASE_URL}/blogs/${blogId}`)
       if (response.ok) {
         const data = await response.json()
         setBlog(data)
@@ -45,7 +46,7 @@ const Blog = () => {
 
   const handleDeleteBlog = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs/${blogId}`, {
+      const response = await fetch(`${BASE_URL}/blogs/${blogId}`, {
         method: 'DELETE'
       })
       if (response.ok) {
@@ -61,7 +62,7 @@ const Blog = () => {
   const handleAddComment = async e => {
     e.preventDefault()
     try {
-      const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs/${blogId}/comments`, {
+      const response = await fetch(`${BASE_URL}/blogs/${blogId}/comments`, {
         method: 'POST',
         body: JSON.stringify(comment),
         headers: {
@@ -119,7 +120,7 @@ const Blog = () => {
         
         { blog.comments.map((b, idx) => <BlogComments key={idx} data={b} /> ) }
         
-        <a href={`${process.env.REACT_APP_BE_URL}/blogs/${blogId}/downloadPDF`}><i className="pdf-icon bi bi-file-earmark-pdf"></i></a>
+        <a href={`${BASE_URL}/blogs/${blogId}/downloadPDF`}><i className="pdf-icon bi bi-file-earmark-pdf"></i></a>
 
         <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>

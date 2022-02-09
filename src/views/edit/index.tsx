@@ -1,23 +1,27 @@
-import React, { useState } from "react"
+import React, { useState, useEffect, FormEvent, ChangeEvent } from "react"
 import "react-quill/dist/quill.snow.css"
 import ReactQuill from "react-quill"
 import { Container, Form, Button } from "react-bootstrap"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import striptags from "striptags"
 import "./styles.css"
 
-const NewBlogPost = () => {
+const EditBlogPost = () => {
+
+  const { REACT_APP_BE_URL: BASE_URL } = process.env
 
   const [title, setTitle] = useState('')
-  const [cover, setCover] = useState(null)
+  const [cover, setCover] = useState('https://picsum.photos/200/300')
   const [authorName, setAuthorName] = useState('')
-  const [authorAvatar, setAuthorAvatar] = useState(null)
   const [category, setCategory] = useState('Action')
   const [content, setContent] = useState('')
+  const [authorAvatar, setAuthorAvatar] = useState<any | null>(null)
+
 
   const navigate = useNavigate()
+  const { blogId } = useParams()
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     const newPost = {
       category,
@@ -25,12 +29,12 @@ const NewBlogPost = () => {
       cover,
       author: {
           name: authorName,
-          },
+        },
       content: striptags(content)
     }
     try {
-      const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs`, {
-        method: 'POST',
+      const response = await fetch(`${BASE_URL}/blogs/${blogId}`, {
+        method: 'PUT',
         body: JSON.stringify(newPost),
         headers: {
           'Content-Type': 'application/json'
@@ -38,103 +42,38 @@ const NewBlogPost = () => {
       })
       if (response.ok) {
         const data = await response.json()
-        handleBlogCoverUploads(data)
-      } else {
-        console.error('POST failed')
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  const handleBlogCoverUploads = async data => {
-    const formData = new FormData()
-    formData.append('cover', cover)
-    try {
-      const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs/${data.id}/uploadCover`, {
-        method: 'PATCH',
-        body: formData
-      })
-      if (response.ok) {
-        if (authorAvatar) {
-          checkIfAvatarExists(data)
-        } else {
-          navigate('/')
-        }
-      } else {
-        console.log('PATCH Failed')
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  const checkIfAvatarExists = async data => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_BE_URL}/authors`)
-      if (response.ok) {
-        const authors = await response.json()
-        const author = authors.find(author => data.author.name === `${author.name} ${author.surname}`)
-        if (author) {
-          handleAuthorAvatarUpload(author)
-        } else {
-          createNewAvatar(data)
-        }
-      } else {
-        console.error('Fetch Failed')
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  const createNewAvatar = async data => {
-    console.log(data)
-    console.log(data.author)
-    console.log(data.author.name)
-    const names = data.author.name.split(' ')
-    const name = names[0]
-    const surname = names[1]
-    const newAuthor = {
-      name,
-      surname,
-    }
-    try {
-      const response = await fetch(`${process.env.REACT_APP_BE_URL}/authors`, {
-        method: 'POST',
-        body: JSON.stringify(newAuthor),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      if (response.ok) {
-        const author = await response.json()
-        handleAuthorAvatarUpload(author)
-      } else {
-        console.error('Creating user Failed')
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  const handleAuthorAvatarUpload = async author => {
-    const formData = new FormData()
-    formData.append('avatar', authorAvatar)
-    try {
-      const response = await fetch(`${process.env.REACT_APP_BE_URL}/authors/${author.id}/uploadAvatar`, {
-        method: 'PATCH',
-        body: formData
-      })
-      if (response.ok) {
         navigate('/')
       } else {
-        console.error('POST AVATR Failed')
+        console.error('fetch failed')
       }
     } catch (error) {
       console.error(error)
     }
   }
+
+  const fetchBlogDetails = async () => {
+    try {
+        const response = await fetch(`${BASE_URL}/blogs/${blogId}`)
+        if (response.ok) {
+          const data = await response.json()
+          setTitle(data.title)
+          setCover(data.cover)
+          setAuthorName(data.author.name)
+          setCategory(data.category)
+          setContent(data.content)
+        } else if (response.status === 404) {
+          navigate('/404')
+        } else {  
+          console.log('Fetch Failed')
+        }
+      } catch (error) {
+        console.error(error)
+      }
+  }
+
+  useEffect(() => {
+    fetchBlogDetails()
+  }, [])
 
     return (
       <Container className="new-blog-container">
@@ -166,8 +105,9 @@ const NewBlogPost = () => {
           <Form.Group controlId="blog-form" className="mt-3">
             <Form.Label>Author Avatar (Optional)</Form.Label>
             <Form.Control type='file' size="lg"  
-              onChange={e => setAuthorAvatar(e.target.files[0])}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setAuthorAvatar(e.target.files[0])}
             />
+            {/* <input type="file" onChange={ (e) => this.handleChange(e.target.files) } /> */}
           </Form.Group>
 
           <Form.Group controlId="blog-category" className="mt-3">
@@ -211,4 +151,4 @@ const NewBlogPost = () => {
     )
 }
 
-export default NewBlogPost
+export default EditBlogPost

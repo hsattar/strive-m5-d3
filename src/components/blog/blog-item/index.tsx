@@ -1,12 +1,18 @@
-import React, { Component } from "react";
-import { Card } from "react-bootstrap";
-import BlogAuthor from "../blog-author";
-import { Link } from "react-router-dom";
-import "./styles.css";
+import React, { Component } from "react"
+import { Card } from "react-bootstrap"
+import BlogAuthor from "../blog-author"
+import { Link } from "react-router-dom"
+import "./styles.css"
 
-export default class BlogItem extends Component {
-  render() {
-    const { title, cover, author, id } = this.props;
+interface Props {
+  title: string
+  cover: string
+  author: string
+  id: string
+}
+
+export default function BlogItem({ title, cover, author, id }: Props) {
+
     return (
       <Link to={`/blog/${id}`} className="blog-link">
         <Card className="blog-card">
@@ -19,6 +25,5 @@ export default class BlogItem extends Component {
           </Card.Footer>
         </Card>
       </Link>
-    );
-  }
+    )
 }

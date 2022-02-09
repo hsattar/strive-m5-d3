@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from "react"
-import "react-quill/dist/quill.snow.css"
+import React, { FormEvent, useState } from "react"
 import ReactQuill from "react-quill"
 import { Container, Form, Button } from "react-bootstrap"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import striptags from "striptags"
+import "react-quill/dist/quill.snow.css"
 import "./styles.css"
 
-const EditBlogPost = () => {
+const NewBlogPost = () => {
+
+  const { REACT_APP_BE_URL: BASE_URL } = process.env
 
   const [title, setTitle] = useState('')
-  const [cover, setCover] = useState('https://picsum.photos/200/300')
+  const [cover, setCover] = useState(null)
   const [authorName, setAuthorName] = useState('')
+  const [authorAvatar, setAuthorAvatar] = useState(null)
   const [category, setCategory] = useState('Action')
   const [content, setContent] = useState('')
-  const [authorAvatar, setAuthorAvatar] = useState(null)
-
 
   const navigate = useNavigate()
-  const { blogId } = useParams()
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     const newPost = {
       category,
@@ -27,12 +27,12 @@ const EditBlogPost = () => {
       cover,
       author: {
           name: authorName,
-        },
+          },
       content: striptags(content)
     }
     try {
-      const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs/${blogId}`, {
-        method: 'PUT',
+      const response = await fetch(`${BASE_URL}/blogs`, {
+        method: 'POST',
         body: JSON.stringify(newPost),
         headers: {
           'Content-Type': 'application/json'
@@ -40,38 +40,103 @@ const EditBlogPost = () => {
       })
       if (response.ok) {
         const data = await response.json()
-        navigate('/')
+        handleBlogCoverUploads(data)
       } else {
-        console.error('fetch failed')
+        console.error('POST failed')
       }
     } catch (error) {
       console.error(error)
     }
   }
 
-  const fetchBlogDetails = async () => {
+  const handleBlogCoverUploads = async data => {
+    const formData = new FormData()
+    formData.append('cover', cover)
     try {
-        const response = await fetch(`${process.env.REACT_APP_BE_URL}/blogs/${blogId}`)
-        if (response.ok) {
-          const data = await response.json()
-          setTitle(data.title)
-          setCover(data.cover)
-          setAuthorName(data.author.name)
-          setCategory(data.category)
-          setContent(data.content)
-        } else if (response.status === 404) {
-          navigate('/404')
-        } else {  
-          console.log('Fetch Failed')
+      const response = await fetch(`${BASE_URL}/blogs/${data.id}/uploadCover`, {
+        method: 'PATCH',
+        body: formData
+      })
+      if (response.ok) {
+        if (authorAvatar) {
+          checkIfAvatarExists(data)
+        } else {
+          navigate('/')
         }
-      } catch (error) {
-        console.error(error)
+      } else {
+        console.log('PATCH Failed')
       }
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  useEffect(() => {
-    fetchBlogDetails()
-  }, [])
+  const checkIfAvatarExists = async data => {
+    try {
+      const response = await fetch(`${BASE_URL}/authors`)
+      if (response.ok) {
+        const authors = await response.json()
+        const author = authors.find(author => data.author.name === `${author.name} ${author.surname}`)
+        if (author) {
+          handleAuthorAvatarUpload(author)
+        } else {
+          createNewAvatar(data)
+        }
+      } else {
+        console.error('Fetch Failed')
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const createNewAvatar = async data => {
+    console.log(data)
+    console.log(data.author)
+    console.log(data.author.name)
+    const names = data.author.name.split(' ')
+    const name = names[0]
+    const surname = names[1]
+    const newAuthor = {
+      name,
+      surname,
+    }
+    try {
+      const response = await fetch(`${BASE_URL}/authors`, {
+        method: 'POST',
+        body: JSON.stringify(newAuthor),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      if (response.ok) {
+        const author = await response.json()
+        handleAuthorAvatarUpload(author)
+      } else {
+        console.error('Creating user Failed')
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const handleAuthorAvatarUpload = async author => {
+    const formData = new FormData()
+    formData.append('avatar', authorAvatar)
+    try {
+      const response = await fetch(`${BASE_URL}/authors/${author.id}/uploadAvatar`, {
+        method: 'PATCH',
+        body: formData
+      })
+      if (response.ok) {
+        navigate('/')
+      } else {
+        console.error('POST AVATR Failed')
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
     return (
       <Container className="new-blog-container">
@@ -148,4 +213,4 @@ const EditBlogPost = () => {
     )
 }
 
-export default EditBlogPost
+export default NewBlogPost

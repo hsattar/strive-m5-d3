@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Row, Col } from "react-bootstrap"
 import BlogItem from "../blog-item"
-// import posts from "../../../data/posts.json"
 
 const BlogList = () => {
 
