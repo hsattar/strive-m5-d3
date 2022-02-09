@@ -1,13 +1,8 @@
-import React, { Component } from "react"
 import { Row, Col, Image } from "react-bootstrap"
+import { Author } from "../../../types/blogInterface"
 import "./styles.css"
 
-interface Props {
-  name: string
-  avatar: string
-}
-
-export default function BlogAuthor({ name, avatar }: Props) {
+export default function BlogAuthor({ name, avatar }: Author) {
     return (
       <Row>
         <Col xs={2}>

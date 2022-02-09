@@ -106,7 +106,7 @@ const Blog = () => {
               <div>{blog.createdAt}</div>
               <div>{`${blog.readTime.value} ${blog.readTime.unit} read`}</div>
               <div style={{marginTop:20}}>
-                <BlogLike defaultLikes={["123"]} onChange={console.log}/>
+                <BlogLike defaultLikes={["123"]} />
               </div>
             </div>
           </div>

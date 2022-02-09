@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react"
 import { Row, Col } from "react-bootstrap"
+import { IBlog } from "../../../types/blogInterface"
 import BlogItem from "../blog-item"
 
 const BlogList = () => {
 
-    const [blogs, setBlogs] = useState([])
+    const [blogs, setBlogs] = useState<IBlog[]>([])
 
     const fetchBlogs = async () => {
       try {

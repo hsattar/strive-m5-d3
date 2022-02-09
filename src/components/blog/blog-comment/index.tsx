@@ -1,9 +1,7 @@
+import { Comment } from "../../../types/blogInterface"
 
 interface Props {
-    data: {
-        author: string
-        text: string
-    }
+    data: Comment
 }
 
 export default function BlogComments({ data }: Props) {

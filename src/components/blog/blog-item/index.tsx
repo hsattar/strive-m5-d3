@@ -1,17 +1,10 @@
-import React, { Component } from "react"
 import { Card } from "react-bootstrap"
 import BlogAuthor from "../blog-author"
 import { Link } from "react-router-dom"
+import { IBlog } from "../../../types/blogInterface"
 import "./styles.css"
 
-interface Props {
-  title: string
-  cover: string
-  author: string
-  id: string
-}
-
-export default function BlogItem({ title, cover, author, id }: Props) {
+export default function BlogItem({ title, cover, author, id }: IBlog) {
 
     return (
       <Link to={`/blog/${id}`} className="blog-link">
