@@ -1,10 +1,10 @@
 import { Card } from "react-bootstrap"
 import BlogAuthor from "../blog-author"
 import { Link } from "react-router-dom"
-import { IBlog } from "../../../types/blogInterface"
+import { IBlogData } from "../../../types/blogInterface" 
 import "./styles.css"
 
-export default function BlogItem({ title, cover, author, id }: IBlog) {
+export default function BlogItem({ title, cover, author, id }: IBlogData) {
 
     return (
       <Link to={`/blog/${id}`} className="blog-link">

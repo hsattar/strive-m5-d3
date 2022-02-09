@@ -11,11 +11,11 @@ const EditBlogPost = () => {
   const { REACT_APP_BE_URL: BASE_URL } = process.env
 
   const [title, setTitle] = useState('')
-  const [cover, setCover] = useState('https://picsum.photos/200/300')
+  const [cover, setCover] = useState<FileList | null | string>('https://picsum.photos/200/300')
   const [authorName, setAuthorName] = useState('')
   const [category, setCategory] = useState('Action')
   const [content, setContent] = useState('')
-  const [authorAvatar, setAuthorAvatar] = useState<any | null>(null)
+  const [authorAvatar, setAuthorAvatar] = useState<FileList | null>(null)
 
 
   const navigate = useNavigate()
@@ -90,7 +90,7 @@ const EditBlogPost = () => {
           <Form.Group controlId="blog-form" className="mt-3">
             <Form.Label>Cover Image</Form.Label>
             <Form.Control type='file' size="lg"  
-              onChange={e => setCover(e.target.files[0])}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setCover(e.target.files)}
             />
           </Form.Group>
 
@@ -105,7 +105,7 @@ const EditBlogPost = () => {
           <Form.Group controlId="blog-form" className="mt-3">
             <Form.Label>Author Avatar (Optional)</Form.Label>
             <Form.Control type='file' size="lg"  
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setAuthorAvatar(e.target.files[0])}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setAuthorAvatar(e.target.files)}
             />
             {/* <input type="file" onChange={ (e) => this.handleChange(e.target.files) } /> */}
           </Form.Group>

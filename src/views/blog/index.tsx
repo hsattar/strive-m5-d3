@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, FormEvent } from "react"
 import { Container, Image, Modal, Button, Form } from "react-bootstrap"
 import BlogAuthor from "../../components/blog/blog-author"
 import BlogLike from "../../components/likes/BlogLike"
 import BlogComments from '../../components/blog/blog-comment'
 import { useParams, useNavigate } from 'react-router-dom'
 import "./styles.css"
+import { IBlogData } from "../../types/blogInterface"
 
-const Blog = () => {
+export default function Blog() {
 
   const { REACT_APP_BE_URL: BASE_URL } = process.env
 
   const { blogId } = useParams()
   const navigate = useNavigate()
 
-  const [blog, setBlog] = useState({})
+  const [blog, setBlog] = useState<IBlogData | null>(null)
   const [loading, setLoading] = useState(true)
 
   const [show, setShow] = useState(false);
@@ -59,7 +60,7 @@ const Blog = () => {
     }
   }
 
-  const handleAddComment = async e => {
+  const handleAddComment = async (e: FormEvent) => {
     e.preventDefault()
     try {
       const response = await fetch(`${BASE_URL}/blogs/${blogId}/comments`, {
@@ -86,8 +87,8 @@ const Blog = () => {
 
   return (
     <div className="blog-details-root">
-      {
-        loading ? <p>Loading...</p> :
+      { loading && <p>Loading...</p> }
+      { blog &&
         <Container>
           <Image className="blog-details-cover" src={blog.cover} fluid />
           <div className="d-flex justify-content-between my-5">
@@ -151,7 +152,6 @@ const Blog = () => {
 
         </Container>
       }
-      </div>
-    )
-    }
-export default Blog
+    </div>
+  )
+}

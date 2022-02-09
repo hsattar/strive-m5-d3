@@ -1,11 +1,14 @@
 export interface IBlog {
-    id:        string
-    category:  string
     title:     string
+    category:  string
     cover:     string
-    readTime:  ReadTime
     author:    Author
     content:   string
+}
+
+export interface IBlogData extends IBlog {
+    id:        string
+    readTime:  ReadTime
     comments:  Comment[]
     createdAt: Date
     updatedAt: Date
