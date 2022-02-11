@@ -1,154 +1,117 @@
-import React, { useState, useEffect, FormEvent, ChangeEvent } from "react"
-import "react-quill/dist/quill.snow.css"
-import ReactQuill from "react-quill"
-import { Container, Form, Button } from "react-bootstrap"
-import { useNavigate, useParams } from "react-router-dom"
-import striptags from "striptags"
-import "./styles.css"
+import { useState, FormEvent, ChangeEvent } from 'react'
+import ReactQuill from 'react-quill'
+import { Container, Form, Button } from 'react-bootstrap'
+import { useNavigate, useParams } from 'react-router-dom'
+import { IBlog } from '../../types/blogInterface'
+import 'react-quill/dist/quill.snow.css'
+import './styles.css'
 
 const EditBlogPost = () => {
 
-  const { REACT_APP_BE_URL: BASE_URL } = process.env
-
-  const [title, setTitle] = useState('')
-  const [cover, setCover] = useState<FileList | null | string>('https://picsum.photos/200/300')
-  const [authorName, setAuthorName] = useState('')
-  const [category, setCategory] = useState('Action')
-  const [content, setContent] = useState('')
-  const [authorAvatar, setAuthorAvatar] = useState<FileList | null>(null)
-
+	const [blog, setBlog] = useState<IBlog>({
+		title: '',
+		category: '',
+		cover: '',
+		author: {
+			name: '',
+			avatar: '',
+		},
+		content: '',
+	})
 
   const navigate = useNavigate()
-  const { blogId } = useParams()
+	const { blogId } = useParams()
+  
+	const handleSubmit = (e: FormEvent) => {}
+	
+  const handleChange = (field: string, value: string) => {
+		setBlog({
+			...blog,
+			[field]: value,
+		})
+	}
+  
+	return (
+		<Container className="new-blog-container">
+			<Form className="mt-5" onSubmit={handleSubmit}>
+				<Form.Group controlId="blog-form" className="mt-3">
+					<Form.Label>Title</Form.Label>
+					<Form.Control
+						size="lg"
+						placeholder="Title"
+						value={blog.title}
+						onChange={e => handleChange('title', e.target.value)}
+					/>
+				</Form.Group>
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    const newPost = {
-      category,
-      title,
-      cover,
-      author: {
-          name: authorName,
-        },
-      content: striptags(content)
-    }
-    try {
-      const response = await fetch(`${BASE_URL}/blogs/${blogId}`, {
-        method: 'PUT',
-        body: JSON.stringify(newPost),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      if (response.ok) {
-        const data = await response.json()
-        navigate('/')
-      } else {
-        console.error('fetch failed')
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
+				<Form.Group controlId="blog-form" className="mt-3">
+					<Form.Label>Cover Image</Form.Label>
+					<Form.Control
+						type="file"
+						size="lg"
+						onChange={e => handleChange('cover', e.target.value)}
+					/>
+				</Form.Group>
 
-  const fetchBlogDetails = async () => {
-    try {
-        const response = await fetch(`${BASE_URL}/blogs/${blogId}`)
-        if (response.ok) {
-          const data = await response.json()
-          setTitle(data.title)
-          setCover(data.cover)
-          setAuthorName(data.author.name)
-          setCategory(data.category)
-          setContent(data.content)
-        } else if (response.status === 404) {
-          navigate('/404')
-        } else {  
-          console.log('Fetch Failed')
-        }
-      } catch (error) {
-        console.error(error)
-      }
-  }
+				<Form.Group controlId="blog-form" className="mt-3">
+					<Form.Label>Author Name</Form.Label>
+					<Form.Control
+						size="lg"
+						placeholder="Author Name"
+						value={blog.author.name}
+						onChange={e => handleChange('author.name', e.target.value)}
+					/>
+				</Form.Group>
 
-  useEffect(() => {
-    fetchBlogDetails()
-  }, [])
+				<Form.Group controlId="blog-form" className="mt-3">
+					<Form.Label>Author Avatar (Optional)</Form.Label>
+					<Form.Control
+						type="file"
+						size="lg"
+						onChange={e => handleChange('avatar', e.target.value)}
+					/>
+				</Form.Group>
 
-    return (
-      <Container className="new-blog-container">
-        <Form className="mt-5" onSubmit={handleSubmit}>
+				<Form.Group controlId="blog-category" className="mt-3">
+					<Form.Label>Category</Form.Label>
+					<Form.Control
+						size="lg"
+						as="select"
+						value={blog.category}
+						onChange={e => handleChange('category', e.target.value)}
+					>
+						<option>Action</option>
+						<option>Comedy</option>
+						<option>Horror</option>
+						<option>Romance</option>
+					</Form.Control>
+				</Form.Group>
 
-          <Form.Group controlId="blog-form" className="mt-3">
-            <Form.Label>Title</Form.Label>
-            <Form.Control size="lg" placeholder="Title" 
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-            />
-          </Form.Group>
+				<Form.Group controlId="blog-content" className="mt-3">
+					<Form.Label>Blog Content</Form.Label>
+					<ReactQuill
+						value={blog.content}
+						onChange={html => handleChange('content', html)}
+						className="new-blog-content"
+					/>
+				</Form.Group>
 
-          <Form.Group controlId="blog-form" className="mt-3">
-            <Form.Label>Cover Image</Form.Label>
-            <Form.Control type='file' size="lg"  
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setCover(e.target.files)}
-            />
-          </Form.Group>
-
-          <Form.Group controlId="blog-form" className="mt-3">
-            <Form.Label>Author Name</Form.Label>
-            <Form.Control size="lg" placeholder="Author Name"  
-              value={authorName}
-              onChange={e => setAuthorName(e.target.value)}
-            />
-          </Form.Group>
-
-          <Form.Group controlId="blog-form" className="mt-3">
-            <Form.Label>Author Avatar (Optional)</Form.Label>
-            <Form.Control type='file' size="lg"  
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setAuthorAvatar(e.target.files)}
-            />
-            {/* <input type="file" onChange={ (e) => this.handleChange(e.target.files) } /> */}
-          </Form.Group>
-
-          <Form.Group controlId="blog-category" className="mt-3">
-            <Form.Label>Category</Form.Label>
-            <Form.Control size="lg" as="select" 
-              value={category}
-              onChange={e => setCategory(e.target.value)}
-            >
-              <option>Action</option>
-              <option>Comedy</option>
-              <option>Horror</option>
-              <option>Romance</option>
-            </Form.Control>
-          </Form.Group>
-
-          <Form.Group controlId="blog-content" className="mt-3">
-            <Form.Label>Blog Content</Form.Label>
-            <ReactQuill
-              value={content}
-              onChange={(html) => setContent(html)}
-              className="new-blog-content"
-            />
-          </Form.Group>
-
-          <Form.Group className="d-flex mt-3 justify-content-end">
-            <Button type="reset" size="lg" variant="outline-dark">
-              Reset
-            </Button>
-            <Button
-              type="submit"
-              size="lg"
-              variant="dark"
-              style={{ marginLeft: "1em" }}
-            >
-              Submit
-            </Button>
-          </Form.Group>
-
-        </Form>
-      </Container>
-    )
+				<Form.Group className="d-flex mt-3 justify-content-end">
+					<Button type="reset" size="lg" variant="outline-dark">
+						Reset
+					</Button>
+					<Button
+						type="submit"
+						size="lg"
+						variant="dark"
+						style={{ marginLeft: '1em' }}
+					>
+						Submit
+					</Button>
+				</Form.Group>
+			</Form>
+		</Container>
+	)
 }
 
 export default EditBlogPost
