@@ -1,4 +1,4 @@
-import { useState, FormEvent, ChangeEvent } from 'react'
+import React, { useState, FormEvent, ChangeEvent } from 'react'
 import ReactQuill from 'react-quill'
 import { Container, Form, Button } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
