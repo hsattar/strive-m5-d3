@@ -1,3 +1,4 @@
+import React from "react"
 import { Container } from "react-bootstrap"
 import BlogList from "../../components/blog/blog-list"
 import "./styles.css"

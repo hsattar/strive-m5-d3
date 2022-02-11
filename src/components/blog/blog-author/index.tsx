@@ -1,3 +1,4 @@
+import React from "react"
 import { Row, Col, Image } from "react-bootstrap"
 import { Author } from "../../../types/blogInterface"
 import "./styles.css"

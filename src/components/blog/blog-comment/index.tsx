@@ -1,3 +1,4 @@
+import React from "react"
 import { Comment } from "../../../types/blogInterface"
 
 interface Props {

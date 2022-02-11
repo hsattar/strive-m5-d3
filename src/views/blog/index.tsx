@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent } from "react"
+import React, { useState, useEffect, FormEvent } from "react"
 import { Container, Image, Modal, Button, Form } from "react-bootstrap"
 import BlogAuthor from "../../components/blog/blog-author"
 import BlogLike from "../../components/likes/BlogLike"
